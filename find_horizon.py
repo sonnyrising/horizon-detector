@@ -252,6 +252,31 @@ def draw_horizon_line(best_line, scale_factor):
     return frame
 
 
+def calculate_attitude(best_line, scale_factor, frame_height, v_fov=60.0):
+    """
+    Converts the mathematical line parameters into aircraft attitude angles.
+    v_fov is the Vertical Field of View of the simulator camera in degrees.
+    """
+    if best_line is None:
+        return (None, None)
+
+    roll_rad, pitch_pixels = best_line
+
+    # Convert roll to degrees
+    roll_angle = np.degrees(roll_rad)
+
+    # Convert pixel distance to pitch angle
+    # Scale the downsampled pixel distance back to the full resolution
+    real_pitch_pixels = pitch_pixels * scale_factor
+    # Find the maximum possible pixel distance from the center
+    max_pitch_pixels = frame_height / 2.0
+    pitch_ratio = real_pitch_pixels / max_pitch_pixels
+    # Map that ratio to the camera's field of view
+    pitch_angle = pitch_ratio * (v_fov / 2.0)
+
+    return (roll_angle, pitch_angle)
+
+
 
 images_dir = "trainingData/images"
 output_dir = "trainingData/horizon_lines_fisher"
