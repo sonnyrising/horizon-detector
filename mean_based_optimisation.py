@@ -203,6 +203,41 @@ def draw_horizon_line(best_line, scale_factor):
     x0 = original_pitch * cos_r
     y0 = original_pitch * sin_r
 
+    # Draw an AHRS style overlay
+    overlay = frame.copy()
+    y, x = np .indices((frame_height, frame_width))
+    x = x - cx
+    y = y - cy
+    full_mask = (x * cos_r + y * sin_r - original_pitch) > 0
+    # 3. Create the boolean mask for the full-size image
+    full_mask = (x * cos_r + y * sin_r - original_pitch) > 0
+
+    # Convert the original frame to grayscale to check brightness
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Calculate the average brightness of both regions
+    mean_A = gray[full_mask].mean()
+    mean_B = gray[~full_mask].mean()
+
+    orange_bgr = (0, 165, 255)  # Ground
+    blue_bgr = (255, 0, 0)  # Sky
+
+    # Assign colours dynamically based on brightness
+    if mean_A > mean_B:
+        # Region A is brighter, so it must be the Sky
+        overlay[full_mask] = blue_bgr
+        overlay[~full_mask] = orange_bgr
+    else:
+        # Region B is brighter, so it must be the Sky
+        overlay[full_mask] = orange_bgr
+        overlay[~full_mask] = blue_bgr
+
+    # Blend the overlay with the original frame (alpha = 0.5 for 50%)
+    alpha = 0.5
+    cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
+
+
     # Project the line to onto the frame
     length = max(frame_height, frame_width) * 2 # Guaranteed to be longer than the frame diagonal
     # Point 1: anchor point + (direction * length)
