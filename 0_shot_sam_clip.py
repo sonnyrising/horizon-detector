@@ -71,7 +71,6 @@ def segment(filename):
 
 def label_segments(cropped_patches, masks):
     # Pre-tokenise the text prompts
-    #? Why?
     text_inputs = processor(text=text_prompts, return_tensors="pt", padding=True).to(device)
 
     # Classify each SAM patch using CLIP
@@ -81,9 +80,9 @@ def label_segments(cropped_patches, masks):
         # Process the image patch
         image_inputs = processor(images=patch, return_tensors="pt").to(device)
 
-        with torch.no_grad(): #? What does no_grad do?
+        with torch.no_grad():
             # Get similarities
-            outputs = clip_model(**image_inputs, **text_inputs) #? What does ** do?
+            outputs = clip_model(**image_inputs, **text_inputs)
             logits_per_image = outputs.logits_per_image # image-text similarity score
             probs = logits_per_image.softmax(dim=1) # normalise to probabilities
 
