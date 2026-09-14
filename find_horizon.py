@@ -97,7 +97,7 @@ def draw_horizon_line(best_line, scale_factor, frame):
 
     tiny_mask = (tiny_x * cos_r + tiny_y * sin_r - pitch) > 0
 
-    # 2. Check brightness on the TINY image (Instantaneous)
+    # Check brightness on the small image
     tiny_gray = cv2.resize(frame, (tiny_w, tiny_h))
     tiny_gray = cv2.cvtColor(tiny_gray, cv2.COLOR_BGR2GRAY)
 
@@ -115,7 +115,7 @@ def draw_horizon_line(best_line, scale_factor, frame):
     orange_bgr = (0, 165, 255)
     blue_bgr = (255, 0, 0)
 
-    # 3. Create a TINY colored image (Instantaneous)
+    # Create a small, coloured image
     tiny_overlay = np.zeros((tiny_h, tiny_w, 3), dtype=np.uint8)
 
     if mean_A > mean_B:
@@ -125,14 +125,14 @@ def draw_horizon_line(best_line, scale_factor, frame):
         tiny_overlay[tiny_mask] = orange_bgr
         tiny_overlay[~tiny_mask] = blue_bgr
 
-    # 4. Stretch the fully colored tiny image to 1080p using C++ backend
+    # Stretch the fully coloured image to 1080p
     full_overlay = cv2.resize(tiny_overlay, (frame_width, frame_height), interpolation=cv2.INTER_NEAREST)
 
-    # 5. Blend it with the main frame
+    # Blend it with the main frame
     alpha = 0.5
     cv2.addWeighted(full_overlay, alpha, frame, 1 - alpha, 0, frame)
 
-    # 6. Draw the crisp, full-resolution line on top
+    # Draw the full-resolution line on top
     length = max(frame_height, frame_width) * 2
     x1 = int(cx + x0 + length * (-sin_r))
     y1 = int(cy + y0 + length * cos_r)
@@ -149,7 +149,7 @@ def find_horizon_vectorized(frame):
     tiny_w = frame.shape[1] // scale_factor
     tiny_h = frame.shape[0] // scale_factor
 
-    # 1. LAZY CACHING: Precompute all 720 masks as a single 3D block
+    # Precompute all 720 masks as a single 3D block
     if CACHE.get('shape') != (tiny_h, tiny_w):
         y, x = np.indices((tiny_h, tiny_w))
         x = x - tiny_w // 2
@@ -188,7 +188,6 @@ def find_horizon_vectorized(frame):
         CACHE['w_B'] = CACHE['count_B'] / total_pixels
         CACHE['shape'] = (tiny_h, tiny_w)
 
-    # 2. REAL-TIME LOOP (No Python 'for' loops!)
     downsampled = cv2.resize(frame, (tiny_w, tiny_h))
     gray = downsampled[:, :, 2].astype(np.float32)
 
