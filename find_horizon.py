@@ -155,8 +155,8 @@ def find_horizon_vectorized(frame):
         x = x - tiny_w // 2
         y = y - tiny_h // 2
 
-        rolls = np.linspace(-np.pi, np.pi, 36)
-        pitches = np.linspace(-tiny_h // 2, tiny_h // 2, 20)
+        rolls = np.linspace(-np.pi, np.pi, 18)
+        pitches = np.linspace(-tiny_h // 2, tiny_h // 2, 10)
 
         # Create every combination of roll and pitch
         roll_grid, pitch_grid = np.meshgrid(rolls, pitches, indexing='ij')
