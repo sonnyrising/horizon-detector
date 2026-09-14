@@ -18,7 +18,6 @@ This project implements a high-performance computer vision pipeline for real-tim
 
 ## Hardware Requirements (If applicable)
 * **Simulation Host:** Standard PC running Windows (required for PyGetWindow window targeting).
-* **Target Embedded Hardware (Real-World Deployment):** Microcontroller (e.g., Raspberry Pi Pico) capable of running C-based algorithms or MicroPython.
 
 ## Installation & Setup
 1. Clone the repository and navigate to the project directory.
